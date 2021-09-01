@@ -1,28 +1,30 @@
-window.addEventListener('load', () => {
- // Wait for loading completion to avoid race conditions with web3 injection timing.
-  if (window.ethereum) async => {
-    const web3 = new Web3(window.ethereum);
+import { useWeb3React } from "@web3-react/core"
+import { injected } from "../components/wallet/Connectors"
+
+export default function Home() {
+  const { active, account, library, connector, activate, deactivate } = useWeb3React()
+
+  async function connect() {
     try {
-      // Request account access if needed
-      await window.ethereum.enable();
-      // Acccounts now exposed
-      return web3;
-    } catch (error) {
-      console.error(error);
+      await activate(injected)
+    } catch (ex) {
+      console.log(ex)
     }
   }
-  // Legacy dapp browsers...
-  else if (window.web3) {
-    // Use Mist/MetaMask's provider.
-    const web3 = window.web3;
-    console.log('Injected web3 detected.');
-    return web3;
+
+  async function disconnect() {
+    try {
+      deactivate()
+    } catch (ex) {
+      console.log(ex)
+    }
   }
-  // Fallback to localhost; use dev console port by default...
-  else {
-    const provider = new Web3.providers.HttpProvider('http://127.0.0.1:9545');
-    const web3 = new Web3(provider);
-    console.log('No web3 instance injected, using Local web3.');
-    return web3;
-  }
-});
+
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <button onClick={connect} className="py-2 mt-20 mb-4 text-lg font-bold text-white rounded-lg w-56 bg-blue-600 hover:bg-blue-800">Connect to MetaMask</button>
+      {active ? <span>Connected with <b>{account}</b></span> : <span>Not connected</span>}
+      <button onClick={disconnect} className="py-2 mt-20 mb-4 text-lg font-bold text-white rounded-lg w-56 bg-blue-600 hover:bg-blue-800">Disconnect</button>
+    </div>
+  )
+}
