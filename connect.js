@@ -1,6 +1,6 @@
 window.addEventListener('load', () => {
  // Wait for loading completion to avoid race conditions with web3 injection timing.
-  if (window.ethereum) {
+  if (window.ethereum) async => {
     const web3 = new Web3(window.ethereum);
     try {
       // Request account access if needed
